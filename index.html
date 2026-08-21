@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S.T.A.R. — Sanitation Technology with Automated Regulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== THEME VARIABLES ===== */
+[data-theme="light"] {
+  --bg: #f0f4f8;
+  --bg2: #ffffff;
+  --bg3: #e8edf2;
+  --panel: #ffffff;
+  --sidebar: #ffffff;
+  --text: #0f172a;
+  --text2: #334155;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #6c3fc5;
+  --accent2: #4f8ef7;
+  --accent-glow: rgba(108,63,197,0.15);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  --card-bg: #ffffff;
+  --input-bg: #f1f5f9;
+  --nav-bg: rgba(255,255,255,0.95);
+}
+[data-theme="dark"] {
+  --bg: #0e0b1a;
+  --bg2: #160d2e;
+  --bg3: #1a1030;
+  --panel: #1e1535;
+  --sidebar: #160d2e;
+  --text: #f1f5f9;
+  --text2: #cbd5e1;
+  --muted: #94a3b8;
+  --border: #2d2050;
+  --accent: #9b6dff;
+  --accent2: #60a5fa;
+  --accent-glow: rgba(155,109,255,0.2);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --shadow: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  --card-bg: #1e1535;
+  --input-bg: #2d2050;
+  --nav-bg: rgba(22,13,46,0.95);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ===== APP LAYOUT ===== */
+.app { display: flex; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 260px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 200;
+  transition: background 0.3s, transform 0.3s;
+  box-shadow: var(--shadow);
+}
+.sidebar-brand {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.brand-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+.brand-text h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 800;
+  color: var(--accent);
+}
+.brand-text span { font-size: 10px; color: var(--muted); }
+
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.nav-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  color: var(--muted); text-transform: uppercase;
+  padding: 8px 8px 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px; border-radius: 10px;
+  cursor: pointer; transition: all 0.2s;
+  color: var(--text2); font-weight: 500;
+  font-size: 14px; margin-bottom: 2px;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--bg3); color: var(--accent); }
+.nav-item.active { background: var(--accent-glow); color: var(--accent); font-weight: 600; }
+.nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
+
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+.theme-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border-radius: 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+}
+.theme-toggle span { font-size: 13px; color: var(--muted); font-weight: 500; }
+.toggle-switch {
+  width: 44px; height: 24px; background: var(--border);
+  border-radius: 12px; position: relative; cursor: pointer;
+  transition: background 0.3s; border: none;
+}
+.toggle-switch.on { background: var(--accent); }
+.toggle-knob {
+  width: 18px; height: 18px; background: white;
+  border-radius: 50%; position: absolute;
+  top: 3px; left: 3px; transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.toggle-switch.on .toggle-knob { transform: translateX(20px); }
+
+/* ===== TOPBAR ===== */
+.topbar {
+  position: fixed; top: 0; left: 260px; right: 0;
+  height: 64px; background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; z-index: 100;
+  transition: background 0.3s;
+}
+.topbar-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 16px; cursor: pointer;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+.notification-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 20px; color: var(--muted); position: relative;
+}
+.notif-dot {
+  width: 8px; height: 8px; background: var(--danger);
+  border-radius: 50%; position: absolute; top: 0; right: 0;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main { margin-left: 260px; margin-top: 64px; padding: 28px; min-height: calc(100vh - 64px); }
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== PAGE HEADERS ===== */
+.page-header { margin-bottom: 28px; }
+.page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; }
+.page-header p { color: var(--muted); margin-top: 4px; font-size: 15px; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  transition: background 0.3s, border 0.3s;
+}
+.card-sm { padding: 16px; }
+
+/* ===== GRID LAYOUTS ===== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* ===== STAT CARDS ===== */
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px;
+  box-shadow: var(--shadow);
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.stat-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 14px;
+}
+.stat-icon.purple { background: rgba(108,63,197,0.12); }
+.stat-icon.blue { background: rgba(79,142,247,0.12); }
+.stat-icon.green { background: rgba(16,185,129,0.12); }
+.stat-icon.orange { background: rgba(245,158,11,0.12); }
+.stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; }
+.stat-label { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.stat-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 50px;
+  font-size: 11px; font-weight: 700; margin-top: 8px;
+}
+.badge-normal { background: rgba(16,185,129,0.12); color: var(--success); }
+.badge-alert { background: rgba(245,158,11,0.12); color: var(--warning); }
+.badge-danger { background: rgba(239,68,68,0.12); color: var(--danger); }
+
+/* ===== HYDRATION RING ===== */
+.hydration-ring-wrap { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+.ring-container { position: relative; width: 140px; height: 140px; flex-shrink: 0; }
+.ring-container svg { transform: rotate(-90deg); }
+.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-pct { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 800; }
+.ring-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.hygiene-status { flex: 1; }
+.status-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 8px;
+  background: rgba(16,185,129,0.1); color: var(--success);
+  font-size: 13px; font-weight: 600; margin-bottom: 12px;
+}
+.status-tag::before { content:''; width:8px; height:8px; background:var(--success); border-radius:50%; }
+.system-ok {
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 10px; padding: 12px 16px;
+  color: var(--success); font-size: 14px; font-weight: 500;
+}
+
+/* ===== ANALYSIS PAGE ===== */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 16px; padding: 48px;
+  text-align: center; cursor: pointer;
+  transition: all 0.3s; position: relative;
+  background: var(--card-bg);
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.upload-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--accent-glow);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; margin: 0 auto 16px;
+}
+.upload-zone h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.upload-zone p { color: var(--muted); font-size: 14px; }
+.btn { 
+  padding: 12px 24px; border-radius: 10px; border: none;
+  font-weight: 700; cursor: pointer; font-size: 14px;
+  transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-lg { padding: 16px 32px; font-size: 16px; border-radius: 12px; }
+.btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+
+/* AI Analysis result */
+.analysis-result {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+.analysis-result.show { display: block; }
+.result-header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px; border-radius: 12px;
+  margin-bottom: 20px;
+}
+.result-header.normal { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+.result-header.warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); }
+.result-header.danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+.result-icon { font-size: 36px; }
+.result-title { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; }
+.result-subtitle { color: var(--muted); font-size: 14px; margin-top: 2px; }
+
+.recommendations-list { display: flex; flex-direction: column; gap: 10px; }
+.rec-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+}
+.rec-item .rec-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.rec-item .rec-text { font-size: 14px; line-height: 1.5; }
+
+.ai-thinking {
+  display: none; text-align: center; padding: 40px;
+}
+.ai-thinking.show { display: block; }
+.thinking-spinner {
+  width: 48px; height: 48px; border: 3px solid var(--border);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== HEALTH DIARY ===== */
+.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 28px; }
+.day-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 8px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.day-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.day-card.active { border-color: var(--accent2); background: rgba(79,142,247,0.08); box-shadow: 0 0 0 2px var(--accent2); }
+.day-card .day-name { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+.day-card .day-date { font-size: 13px; font-weight: 700; margin: 4px 0; }
+.day-icon { font-size: 18px; margin-bottom: 4px; }
+.day-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto; }
+.day-dot.green { background: var(--success); }
+.day-dot.orange { background: var(--warning); }
+.day-dot.red { background: var(--danger); }
+.day-dot.empty { background: var(--border); }
+
+/* Chart placeholder */
+.chart-area {
+  background: var(--bg3); border-radius: 12px; height: 180px;
+  display: flex; align-items: flex-end; gap: 3px; padding: 16px;
+  position: relative; overflow: hidden;
+}
+.chart-line-svg { width: 100%; height: 100%; }
+
+/* ===== COMMUNITY ===== */
+.post-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 16px;
+  transition: box-shadow 0.2s;
+}
+.post-card:hover { box-shadow: var(--shadow); }
+.post-author { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.author-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 14px; font-weight: 700;
+}
+.author-name { font-weight: 700; font-size: 14px; }
+.author-time { color: var(--muted); font-size: 12px; }
+.post-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+.post-body { color: var(--text2); font-size: 14px; line-height: 1.6; }
+.post-actions { display: flex; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.post-action-btn {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px; border-radius: 6px; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.post-action-btn:hover { background: var(--bg3); color: var(--accent); }
+
+/* ===== AI ASSISTANT ===== */
+.chat-container {
+  display: flex; flex-direction: column;
+  height: calc(100vh - 200px); min-height: 500px;
+}
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 16px;
+  background: var(--bg3); border-radius: 14px; margin-bottom: 16px;
+  border: 1px solid var(--border);
+}
+.chat-msg { display: flex; gap: 10px; max-width: 80%; }
+.chat-msg.user { flex-direction: row-reverse; margin-left: auto; }
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.msg-avatar.ai { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+.msg-avatar.user { background: var(--bg2); border: 1px solid var(--border); }
+.msg-bubble {
+  padding: 12px 16px; border-radius: 14px;
+  font-size: 14px; line-height: 1.6;
+}
+.chat-msg.ai .msg-bubble { background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px 14px 14px 14px; }
+.chat-msg.user .msg-bubble { background: var(--accent); color: white; border-radius: 14px 4px 14px 14px; }
+.chat-input-row { display: flex; gap: 10px; }
+.chat-input {
+  flex: 1; background: var(--input-bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border 0.2s;
+}
+.chat-input:focus { border-color: var(--accent); }
+
+/* ===== SETTINGS ===== */
+.settings-section { margin-bottom: 28px; }
+.settings-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-info h4 { font-size: 14px; font-weight: 600; }
+.setting-info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ===== LOGIN / REGISTER ===== */
+.auth-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center;
+}
+.auth-overlay.show { display: flex; }
+.auth-modal {
+  background: var(--panel); border-radius: 20px;
+  padding: 36px; width: 440px; max-width: 95vw;
+  border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+  position: relative; animation: fadeIn 0.3s ease;
+}
+.auth-modal h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+.auth-modal p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.input-group { margin-bottom: 16px; }
+.input-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.input-group input, .input-group select {
+  width: 100%; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; color: var(--text);
+  font-size: 14px; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border 0.2s;
+}
+.input-group input:focus { border-color: var(--accent); }
+.auth-link { color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; font-size: 14px; }
+.close-btn { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); }
+.close-btn:hover { color: var(--text); }
+
+/* ===== LANDING PAGE ===== */
+.landing-hero {
+  text-align: center; padding: 60px 20px 40px;
+  max-width: 720px; margin: 0 auto;
+}
+.landing-hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 48px; font-weight: 800; line-height: 1.1;
+  margin-bottom: 16px;
+}
+.landing-hero h1 span { color: var(--accent); }
+.landing-hero p { color: var(--muted); font-size: 18px; line-height: 1.6; margin-bottom: 32px; }
+.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+.feature-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px; text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.feature-icon { font-size: 36px; margin-bottom: 12px; }
+.feature-card h3 { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+.feature-card p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+/* ===== PROFILE ===== */
+.profile-header {
+  display: flex; align-items: center; gap: 24px;
+  padding: 28px; background: var(--card-bg);
+  border-radius: 16px; border: 1px solid var(--border);
+  margin-bottom: 24px; box-shadow: var(--shadow);
+}
+.profile-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: white; flex-shrink: 0;
+}
+.profile-name { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; }
+.profile-email { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main, .topbar { margin-left: 0; left: 0; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .week-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 600px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .landing-hero h1 { font-size: 32px; }
+  .week-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Mobile menu btn */
+.menu-btn {
+  display: none; background: none; border: none;
+  font-size: 22px; cursor: pointer; color: var(--text);
+}
+@media (max-width: 900px) { .menu-btn { display: block; } }
+
+.overlay-backdrop {
+  display: none; position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.5);
+}
+.overlay-backdrop.show { display: block; }
+
+/* Textarea */
+textarea.chat-input { resize: none; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">✦</div>
+    <div class="brand-text">
+      <h2>S.T.A.R.</h2>
+      <span>Smart Sanitation System</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <button class="nav-item active" onclick="navigate('home')">
+      <span class="nav-icon">🏠</span> Home
+    </button>
+    <button class="nav-item" onclick="navigate('dashboard')">
+      <span class="nav-icon">⊞</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="navigate('analysis')">
+      <span class="nav-icon">🔬</span> Analysis
+    </button>
+    <button class="nav-item" onclick="navigate('diary')">
+      <span class="nav-icon">📖</span> Health Diary
+    </button>
+    <button class="nav-item" onclick="navigate('assistant')">
+      <span class="nav-icon">🤖</span> AI Assistant
+    </button>
+    <button class="nav-item" onclick="navigate('community')">
+      <span class="nav-icon">👥</span> Community
+    </button>
+    <div class="nav-section-label" style="margin-top:12px">Account</div>
+    <button class="nav-item" onclick="navigate('profile')">
+      <span class="nav-icon">👤</span> Profile
+    </button>
+    <button class="nav-item" onclick="navigate('settings')">
+      <span class="nav-icon">⚙️</span> Settings
+    </button>
+    <button class="nav-item" onclick="showLogin()">
+      <span class="nav-icon">🔑</span> <span id="authLabel">Login / Register</span>
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="theme-toggle">
+      <span id="themeLabel">🌙 Dark Mode</span>
+      <button class="toggle-switch" id="themeToggle" onclick="toggleTheme()">
+        <div class="toggle-knob"></div>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div class="overlay-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:14px">
+    <button class="menu-btn" onclick="openSidebar()">☰</button>
+    <span class="topbar-title" id="topbarTitle">Home</span>
+  </div>
+  <div class="topbar-right">
+    <button class="notification-btn" title="Notifications">🔔<div class="notif-dot"></div></button>
+    <div class="avatar" onclick="showLogin()">👤</div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HOME / LANDING -->
+  <div class="page active" id="page-home">
+    <div class="landing-hero">
+      <h1>Smart Sanitation,<br><span>Healthier Living.</span></h1>
+      <p>S.T.A.R. transforms your toilet into a diagnostic device — non-invasive, real-time health monitoring powered by AI and embedded biosensors.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-lg" onclick="navigate('analysis')">🔬 Try Analysis</button>
+        <button class="btn btn-secondary btn-lg" onclick="navigate('dashboard')">⊞ Dashboard</button>
+        <button class="btn btn-secondary btn-lg" onclick="showLogin()">Register Now</button>
+      </div>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🦠</div>
+        <h3>Biomarker Detection</h3>
+        <p>Automated detection of pH, glucose, protein, ketones and more through non-invasive sensors.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>AI-Powered Analysis</h3>
+        <p>CNN deep learning model classifies stool types and identifies potential health risks in real-time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💧</div>
+        <h3>Hydration Monitoring</h3>
+        <p>Continuous hydration level tracking with smart alerts and personalized recommendations.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>UVC Sterilization</h3>
+        <p>Automated UV-C sterilization cycle keeps sensors and surfaces hygienically clean after each use.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Health Diary</h3>
+        <p>Weekly trend analysis and biomarker pattern tracking to spot long-term health changes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Private & Secure</h3>
+        <p>End-to-end encrypted health data stored securely. Your data stays yours.</p>
+      </div>
+    </div>
+
+    <!-- Team -->
+    <div class="card" style="margin-top:40px">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;margin-bottom:20px">Our Team</h2>
+      <div class="grid-3">
+        <div style="text-align:center;padding:16px">
+          <img src="rohith.photo.jpeg" 
+            style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid white;box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+        </div>
+        <div style="text-align:center;padding:16px">
+          <img src="sanchay.photo.jpeg" 
+          style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid white;box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+          <div style="color:var(--muted);font-size:13px">Embedded Systems</div>
+        </div>
+        <div style="text-align:center;padding:16px">
+          <img src="praveen.photo.jpeg" 
+           style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid white;box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+          <div style="font-weight:700">K. Praveen</div>
+          <div style="color:var(--muted);font-size:13px">Product & UX</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="card" style="margin-top:24px">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;margin-bottom:20px">Contact & Partnership</h2>
+      <div class="grid-2">
+        <div>
+          <h4 style="margin-bottom:12px;color:var(--accent)">Contact Us</h4>
+          <div style="font-size:14px;color:var(--muted);line-height:2">
+            📧 rgsrohith.be@gmail.com<br>
+            📧 sanchaysrinivasan@gmail.com<br>
+            📧 inventpraveence2006@gmail.com<br>
+            📱 +91 81485 07642
+          </div>
+        </div>
+        <div>
+          <h4 style="margin-bottom:12px;color:var(--accent)">Partnership Inquiry</h4>
+          <div class="input-group"><input type="text" placeholder="Your Name" id="partName"></div>
+          <div class="input-group"><input type="email" placeholder="Your Email" id="partEmail"></div>
+          <div class="input-group"><textarea style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;resize:none;outline:none" rows="3" id="partMessage" placeholder="Tell us about your proposal..."></textarea></div>
+          <button class="btn btn-primary" onclick="sendPartnership()">💬 Send via WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page" id="page-dashboard">
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p>Real-time health monitoring and system status</p>
+    </div>
+
+    <!-- Hygiene Status Card -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="hydration-ring-wrap">
+        <div class="ring-container">
+          <svg viewBox="0 0 140 140" width="140" height="140">
+            <circle cx="70" cy="70" r="58" fill="none" stroke="var(--border)" stroke-width="10"/>
+            <circle cx="70" cy="70" r="58" fill="none"
+              stroke="url(#ringGrad)" stroke-width="10"
+              stroke-dasharray="364" stroke-dashoffset="80"
+              stroke-linecap="round" id="hydRing"/>
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="var(--accent)"/>
+                <stop offset="100%" stop-color="var(--accent2)"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="hydPct">78%</div>
+            <div class="ring-sub">Hydration</div>
+          </div>
+        </div>
+        <div class="hygiene-status">
+          <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;margin-bottom:10px">Hygiene System Status</h3>
+          <div class="status-tag">UVC Sterilization Cycle Active</div>
+          <div class="system-ok">⚡ All systems operating within safe parameters.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Biomarker Cards -->
+    <h3 style="font-weight:700;font-size:16px;margin-bottom:14px">Biomarker Analysis</h3>
+    <div class="grid-4" style="margin-bottom:24px">
+      <div class="stat-card">
+        <div class="stat-icon purple">📊</div>
+        <div class="stat-value" id="bioPh">7.2 <span style="font-size:14px;color:var(--muted)">pH</span></div>
+        <div class="stat-label">pH Level</div>
+        <span class="stat-badge badge-normal" id="bioPhBadge">Normal</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">🔥</div>
+        <div class="stat-value" id="bioGlucose">95 <span style="font-size:14px;color:var(--muted)">mg/dL</span></div>
+        <div class="stat-label">Glucose</div>
+        <span class="stat-badge badge-normal" id="bioGlucoseBadge">Normal</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">🧪</div>
+        <div class="stat-value" id="bioProtein">12 <span style="font-size:14px;color:var(--muted)">mg/dL</span></div>
+        <div class="stat-label">Protein</div>
+        <span class="stat-badge badge-alert" id="bioProteinBadge">Alert</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">⚗️</div>
+        <div class="stat-value" id="bioAmmonia">0.8 <span style="font-size:14px;color:var(--muted)">mmol/L</span></div>
+        <div class="stat-label">Ammonia</div>
+        <span class="stat-badge badge-normal" id="bioAmmoniaBadge">Normal</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4 style="font-weight:700;margin-bottom:16px">Weekly Trend</h4>
+        <div class="chart-area">
+          <svg class="chart-line-svg" viewBox="0 0 400 140" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,100 C50,80 80,60 120,70 S200,40 250,50 S330,30 400,45" fill="none" stroke="var(--accent2)" stroke-width="2.5" stroke-linecap="round" id="dashTrend"/>
+            <path d="M0,100 C50,80 80,60 120,70 S200,40 250,50 S330,30 400,45 L400,140 L0,140 Z" fill="url(#lineGrad)" id="dashTrendFill"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="font-weight:700;margin-bottom:16px">System Diagnostics</h4>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px">Camera Sensor</span>
+            <span class="stat-badge badge-normal">Online</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px">Ultrasonic Sensor</span>
+            <span class="stat-badge badge-normal">Online</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px">Biosensor Array</span>
+            <span class="stat-badge badge-alert">Calibrating</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px">UVC Module</span>
+            <span class="stat-badge badge-normal">Active</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px">Edge AI Processor</span>
+            <span class="stat-badge badge-normal">Running</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div class="page" id="page-analysis">
+    <div class="page-header">
+      <h1>Sample Analysis</h1>
+      <p>Upload a sample image for AI-powered biomarker detection and condition classification</p>
+    </div>
+
+    <div class="grid-2" style="align-items:start">
+      <div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+          <div class="upload-icon">⬆</div>
+          <h3>Upload Sample Image</h3>
+          <p>Drag & drop or click to select<br>Supports JPG, PNG, WEBP</p>
+          <button class="btn btn-primary" style="margin-top:20px" onclick="event.stopPropagation();document.getElementById('fileInput').click()">Select Image</button>
+          <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+        </div>
+
+        <div id="imagePreviewCard" style="display:none;margin-top:16px" class="card">
+          <h4 style="font-weight:700;margin-bottom:12px">Uploaded Image</h4>
+          <div id="previewWrapper" style="position:relative">
+            <img id="previewImg" style="width:100%;border-radius:10px;max-height:250px;object-fit:cover" alt="Preview">
+            <div id="privacyPlaceholder" style="display:none;position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:10px;font-weight:700;color:var(--muted)">🔒 Image Hidden for Privacy</div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="btn btn-primary" onclick="runAIAnalysis()" id="analyzeBtn">🤖 Analyze with AI</button>
+            <button class="btn btn-secondary" onclick="resetAnalysis()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ai-thinking" id="aiThinking">
+          <div class="thinking-spinner"></div>
+          <h3 style="font-weight:700;margin-bottom:8px">Analyzing Image...</h3>
+          <p style="color:var(--muted);font-size:14px">AI is processing your sample. This simulates the CNN model that will run on the S.T.A.R. hardware.</p>
+        </div>
+
+        <div class="analysis-result card" id="analysisResult">
+          <div class="result-header normal" id="resultHeader">
+            <div class="result-icon" id="resultIcon">✅</div>
+            <div>
+              <div class="result-title" id="resultTitle">Normal</div>
+              <div class="result-subtitle" id="resultSubtitle">Healthy bowel movement detected</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+              <span style="color:var(--muted)">Confidence Score</span>
+              <span id="confidenceText" style="font-weight:700;color:var(--accent)">—</span>
+            </div>
+            <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+              <div id="confidenceBar" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width 0.8s ease;border-radius:4px"></div>
+            </div>
+          </div>
+
+          <h4 style="font-weight:700;margin-bottom:12px">AI Recommendations</h4>
+          <div class="recommendations-list" id="recList"></div>
+
+          <button class="btn btn-primary" style="width:100%;margin-top:16px;justify-content:center" onclick="downloadReport()">📥 Download Report</button>
+        </div>
+
+        <div class="card" id="placeholderCard">
+          <div style="text-align:center;padding:32px;color:var(--muted)">
+            <div style="font-size:48px;margin-bottom:12px">🔬</div>
+            <h3 style="font-weight:700;margin-bottom:8px">Ready for Analysis</h3>
+            <p style="font-size:14px">Upload an image on the left to run AI-powered condition detection.</p>
+            <div style="margin-top:20px;padding:14px;background:var(--bg3);border-radius:10px;font-size:12px;color:var(--muted);text-align:left">
+              <strong>Note:</strong> Analysis runs completely in your browser — your image never leaves your device. This mirrors the CNN model that runs on the embedded processor in the final S.T.A.R. hardware.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEALTH DIARY -->
+  <div class="page" id="page-diary">
+    <div class="page-header">
+      <h1>Health Diary</h1>
+      <p>Track your weekly health trends and biomarker patterns</p>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <h3 style="font-weight:700;margin-bottom:16px">📅 Weekly Overview</h3>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+    <div class="card">
+      <h3 style="font-weight:700;margin-bottom:16px">📈 Biomarker Trends</h3>
+      <div class="chart-area">
+        <svg class="chart-line-svg" viewBox="0 0 600 140" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--accent2)" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="var(--accent2)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,90 C60,75 100,65 160,70 S260,50 310,58 S400,45 450,52 S530,38 600,44" fill="none" stroke="var(--accent2)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="0" cy="90" r="4" fill="var(--accent2)"/>
+          <circle cx="160" cy="70" r="4" fill="var(--accent2)"/>
+          <circle cx="310" cy="58" r="4" fill="var(--accent2)"/>
+          <circle cx="450" cy="52" r="4" fill="var(--accent2)"/>
+          <circle cx="600" cy="44" r="4" fill="var(--accent2)"/>
+          <path d="M0,90 C60,75 100,65 160,70 S260,50 310,58 S400,45 450,52 S530,38 600,44 L600,140 L0,140 Z" fill="url(#areaGrad)"/>
+          <text x="5" y="135" font-size="11" fill="var(--muted)">Mon</text>
+          <text x="145" y="135" font-size="11" fill="var(--muted)">Tue</text>
+          <text x="295" y="135" font-size="11" fill="var(--muted)">Wed</text>
+          <text x="435" y="135" font-size="11" fill="var(--muted)">Thu</text>
+          <text x="580" y="135" font-size="11" fill="var(--muted)">Fri</text>
+        </svg>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px"><div style="width:12px;height:12px;background:var(--accent2);border-radius:50%"></div>Hydration Score</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px"><div style="width:12px;height:12px;background:var(--success);border-radius:50%"></div>pH Level</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px"><div style="width:12px;height:12px;background:var(--warning);border-radius:50%"></div>Protein</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ASSISTANT -->
+  <div class="page" id="page-assistant">
+    <div class="page-header">
+      <h1>AI Health Assistant</h1>
+      <p>Ask anything about your health data, biomarkers, or S.T.A.R. system</p>
+    </div>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg ai">
+          <div class="msg-avatar ai">✦</div>
+          <div class="msg-bubble">Hello! I'm your S.T.A.R. AI Health Assistant. I can help you understand your biomarker readings, explain health trends, and answer questions about sanitation health. What would you like to know today?</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your health data..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary" onclick="sendChat()">Send ➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY -->
+  <div class="page" id="page-community">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+      <div>
+        <h1>Community</h1>
+        <p>Share insights and learn from other S.T.A.R. users</p>
+      </div>
+      <button class="btn btn-primary" onclick="showNewPost()">💬 New Post</button>
+    </div>
+    <div id="postsList">
+      <div class="post-card">
+        <div class="post-author">
+          <div class="author-avatar">D</div>
+          <div><div class="author-name">Dr. Sarah Chen</div><div class="author-time">2 hours ago</div></div>
+        </div>
+        <div class="post-title">Tips for Maintaining Optimal Hydration Levels</div>
+        <div class="post-body">I've been using S.T.A.R. for 3 months now and found that drinking water consistently throughout the day (rather than large amounts at once) helps maintain stable hydration levels. The AI Assistant confirms this pattern in my data.</div>
+        <div class="post-actions">
+          <button class="post-action-btn" onclick="likePost(this)">👍 24</button>
+          <button class="post-action-btn">💬 8 Comments</button>
+          <button class="post-action-btn">🔗 Share</button>
+        </div>
+      </div>
+      <div class="post-card">
+        <div class="post-author">
+          <div class="author-avatar">M</div>
+          <div><div class="author-name">Marcus Johnson</div><div class="author-time">5 hours ago</div></div>
+        </div>
+        <div class="post-title">Understanding Protein Level Fluctuations</div>
+        <div class="post-body">Has anyone else noticed protein level variations after intense workouts? My readings spike to 14–15 mg/dL post-exercise but normalize within 24 hours. The Edge AI analysis helped me understand this is normal for my activity level.</div>
+        <div class="post-actions">
+          <button class="post-action-btn" onclick="likePost(this)">👍 18</button>
+          <button class="post-action-btn">💬 12 Comments</button>
+          <button class="post-action-btn">🔗 Share</button>
+        </div>
+      </div>
+      <div class="post-card">
+        <div class="post-author">
+          <div class="author-avatar">A</div>
+          <div><div class="author-name">Anita Patel</div><div class="author-time">1 day ago</div></div>
+        </div>
+        <div class="post-title">S.T.A.R. Detected Early Glucose Anomaly</div>
+        <div class="post-body">Wanted to share — S.T.A.R. flagged a glucose alert last week. I followed up with my doctor and turns out I was borderline pre-diabetic. Early detection made all the difference. Incredibly grateful for this technology.</div>
+        <div class="post-actions">
+          <button class="post-action-btn" onclick="likePost(this)">👍 47</button>
+          <button class="post-action-btn">💬 23 Comments</button>
+          <button class="post-action-btn">🔗 Share</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="page-profile">
+    <div class="page-header"><h1>Profile</h1><p>Manage your personal information</p></div>
+    <div class="profile-header">
+      <div class="profile-avatar">👤</div>
+      <div>
+        <div class="profile-name" id="profileName">Guest User</div>
+        <div class="profile-email" id="profileEmail">Not logged in</div>
+        <div style="margin-top:8px"><span class="stat-badge badge-normal">Free Plan</span></div>
+      </div>
+      <button class="btn btn-secondary" style="margin-left:auto" onclick="showLogin()">Edit Profile</button>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h4 style="font-weight:700;margin-bottom:14px">Health Overview</h4>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:14px">Total Scans</span><span style="font-weight:700" id="profScans">0</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:14px">Last Analysis</span><span style="font-weight:700" id="profLast">—</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:14px">Average Hydration</span><span style="font-weight:700" id="profHyd">—</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:14px">Member Since</span><span style="font-weight:700">2026</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="font-weight:700;margin-bottom:14px">Recent Activity</h4>
+        <div id="activityLog" style="color:var(--muted);font-size:14px;text-align:center;padding:20px">No activity yet. Run an analysis to get started.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="page-header"><h1>Settings</h1><p>Customize your S.T.A.R. experience</p></div>
+    <div class="card">
+      <div class="settings-section">
+        <h3>🎨 Appearance</h3>
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Theme</h4>
+            <p>Switch between Light and Dark mode</p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-sm" id="lightModeBtn" onclick="setTheme('light')" style="background:var(--accent);color:white">☀️ Light</button>
+            <button class="btn btn-sm btn-secondary" id="darkModeBtn" onclick="setTheme('dark')">🌙 Dark</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <h4>Font Size</h4>
+            <p>Adjust text size for readability</p>
+          </div>
+          <select style="background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif" onchange="document.body.style.fontSize=this.value">
+            <option value="14px">Normal</option>
+            <option value="16px">Large</option>
+            <option value="12px">Small</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🔔 Notifications</h3>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Health Alerts</h4><p>Get notified when biomarkers are abnormal</p></div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Daily Summary</h4><p>Receive daily health digest</p></div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Community Updates</h4><p>New posts from community</p></div>
+          <button class="toggle-switch" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🔒 Privacy & Data</h3>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Data Encryption</h4><p>End-to-end encryption for health data</p></div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Anonymous Analytics</h4><p>Help improve S.T.A.R. with anonymous usage data</p></div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Export Health Data</h4><p>Download your full health history as JSON</p></div>
+          <button class="btn btn-secondary btn-sm">Export Data</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>⚙️ Device Settings</h3>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Auto-Sterilization</h4><p>UVC cycle triggers automatically after each use</p></div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info"><h4>Sensor Sensitivity</h4><p>Biosensor detection threshold</p></div>
+          <select style="background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif">
+            <option>High</option><option>Medium</option><option>Low</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- LOGIN MODAL -->
+<div class="auth-overlay" id="loginOverlay">
+  <div class="auth-modal">
+    <button class="close-btn" onclick="closeAuth()">×</button>
+    <h2>Welcome Back</h2>
+    <p>Sign in to your S.T.A.R. account</p>
+    <div class="input-group"><label>Username / Email</label><input type="text" id="loginUser" placeholder="Enter your username"></div>
+    <div class="input-group"><label>Password</label><input type="password" id="loginPass" placeholder="Enter your password"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:16px" onclick="doLogin()">Login →</button>
+    <p style="text-align:center;font-size:14px;color:var(--muted)">Don't have an account? <button class="auth-link" onclick="showRegister()">Create Account</button></p>
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->       
+<div class="auth-overlay" id="registerOverlay">
+  <div class="auth-modal">
+    <button class="close-btn" onclick="closeAuth()">×</button>
+    <h2>Create Account</h2>
+    <p>Join S.T.A.R. for smart health monitoring</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="input-group"><label>Full Name</label><input type="text" id="regName" placeholder="Your name"></div>
+      <div class="input-group"><label>Age</label><input type="number" id="regAge" placeholder="Age" min="1" max="120"></div>
+      <div class="input-group"><label>Email</label><input type="email" id="regEmail" placeholder="Email"></div>
+      <div class="input-group"><label>Phone</label><input type="tel" id="regPhone" placeholder="+91..."></div>
+      <div class="input-group"><label>City</label><input type="text" id="regCity" placeholder="City"></div>
+      <div class="input-group"><label>Country</label>
+        <select id="regCountry"><option value="">Select</option><option>India</option><option>USA</option><option>UK</option><option>Canada</option><option>Australia</option></select>
+      </div>
+    </div>
+    <div class="input-group"><label>Password</label><input type="password" id="regPass" placeholder="Create password"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:16px" onclick="doRegister()">Register & Continue →</button>
+    <p style="text-align:center;font-size:14px;color:var(--muted)">Already have an account? <button class="auth-link" onclick="showLoginModal()">Sign In</button></p>
+  </div>
+</div>
+
+<!-- NEW POST MODAL -->
+<div class="auth-overlay" id="newPostOverlay">
+  <div class="auth-modal">
+    <button class="close-btn" onclick="closeAuth()">×</button>
+    <h2>New Post</h2>
+    <p>Share with the S.T.A.R. community</p>
+    <div class="input-group"><label>Title</label><input type="text" id="postTitle" placeholder="Post title..."></div>
+    <div class="input-group"><label>Content</label><textarea id="postContent" rows="5" style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;outline:none" placeholder="Share your experience or question..."></textarea></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitPost()">Publish Post</button>
+  </div>
+</div>
+
+<script>
+// ===== S.T.A.R. DATA LAYER (StarStore) =====
+// Persists analysis reports in localStorage so the app works fully offline.
+const StarStore = (() => {
+  const REPORTS_KEY = 'star_reports';
+  const read = (key, fallback) => {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  };
+  const write = (key, value) => {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  };
+  const getReports = () => read(REPORTS_KEY, []);
+  const addReport = (report) => {
+    const reports = getReports();
+    reports.unshift(report);
+    write(REPORTS_KEY, reports.slice(0, 100));
+  };
+  const getLatestReport = () => getReports()[0] || null;
+  return { getReports, addReport, getLatestReport };
+})();
+
+// ===== S.T.A.R. VISION ENGINE (StarVision) =====
+// Reads the actual pixels of the uploaded image and classifies it into one
+// of four stool types. Runs entirely in the browser - no server, no API key.
+const StarVision = (() => {
+  const TYPE_DEFS = {
+    1: {
+      type: 1, name: 'Type 1 - Normal', label: 'Normal',
+      classification: 'Healthy Stool', color: 'brown',
+      texture: 'solid, smooth', shape: 'well formed',
+      bristol: 'Type 4 (sausage-like)', risk: 'LOW', riskScore: 20,
+      icon: '✅', hydration: 82,
+      conditions: ['Normal bowel movement', 'No major abnormalities detected'],
+      recommendations: [
+        'Maintain hydration by drinking 2.5-3L of water daily.',
+        'Continue a balanced diet rich in fibre, fruits and vegetables.',
+        'Maintain consistent physical activity and healthy habits.',
+      ],
+    },
+    2: {
+      type: 2, name: 'Type 2 - Loose Motion', label: 'Loose Motion',
+      classification: 'Loose Stool', color: 'pale / yellow / greenish',
+      texture: 'semi-liquid, soft', shape: 'loose, unformed',
+      bristol: 'Type 6-7 (soft / watery)', risk: 'MEDIUM', riskScore: 50,
+      icon: '💧', hydration: 60,
+      conditions: ['Mild gastroenteritis', 'Dietary sensitivity', 'Possible infection'],
+      recommendations: [
+        'Drink plenty of fluids to avoid dehydration.',
+        'Consume ORS (oral rehydration solution) if frequency is high.',
+        'Eat bland, easy-to-digest foods like rice, bananas and toast.',
+        'Consult a doctor if loose motion persists beyond 48 hours.',
+      ],
+    },
+    3: {
+      type: 3, name: 'Type 3 - Tight Solid', label: 'Constipation',
+      classification: 'Constipated Stool', color: 'dark brown',
+      texture: 'hard, dry, compact', shape: 'lumpy, pellet-like',
+      bristol: 'Type 1-2 (hard lumps)', risk: 'MEDIUM', riskScore: 45,
+      icon: '🪨', hydration: 45,
+      conditions: ['Constipation', 'Low fibre intake', 'Reduced hydration'],
+      recommendations: [
+        'Increase daily water intake significantly.',
+        'Add fibre-rich foods: whole grains, fruits, vegetables, legumes.',
+        'Incorporate regular physical activity.',
+        'Consider a mild stool softener or laxative after consulting a doctor.',
+      ],
+    },
+    4: {
+      type: 4, name: 'Type 4 - High Risk', label: 'High Risk',
+      classification: 'High-Risk Gastrointestinal Pattern',
+      color: 'black / red', texture: 'tarry / bloody', shape: 'irregular',
+      bristol: 'N/A - Abnormal', risk: 'HIGH', riskScore: 90,
+      icon: '⚠️', hydration: 35,
+      conditions: [
+        'Gastrointestinal bleeding (black/tarry stool)',
+        'Blood in stool (bright red / maroon)',
+        'Possible colorectal disease - immediate review required',
+      ],
+      recommendations: [
+        'Seek medical consultation immediately.',
+        'Do not self-medicate with stool softeners or laxatives.',
+        'Collect a fresh sample for laboratory testing if advised.',
+        'Provide your doctor with a complete symptom history.',
+        'If dizziness, severe pain or weakness occur, visit emergency care.',
+      ],
+    },
+  };
+  const DISCLAIMER = 'This AI analysis is for educational and research purposes only and is not a medical diagnosis. Consult a qualified medical professional for proper evaluation.';
+
+  const analyzeFile = (file) => new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const MAX = 320;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const stats = computeColorStats(pixels);
+        const analysis = classify(stats);
+        const report = buildReport(analysis, stats, file);
+        report.thumbnail = canvas.toDataURL('image/jpeg', 0.6);
+        URL.revokeObjectURL(url);
+        resolve(report);
+      } catch (e) {
+        URL.revokeObjectURL(url);
+        reject(e);
+      }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not load image')); };
+    img.src = url;
+  });
+
+  const computeColorStats = (imageData) => {
+    const d = imageData.data;
+    const len = d.length;
+    const counts = { total: 0, brown: 0, darkBrown: 0, black: 0, red: 0, maroon: 0, pale: 0, yellowGreen: 0, white: 0 };
+    let sumR = 0, sumG = 0, sumB = 0;
+    for (let i = 0; i < len; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+      if (a < 100) continue;
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (lum > 235) { counts.white++; continue; }
+      counts.total++;
+      sumR += r; sumG += g; sumB += b;
+      if (isRed(r, g, b)) counts.red++;
+      else if (isMaroon(r, g, b)) counts.maroon++;
+      else if (isBlack(r, g, b)) counts.black++;
+      else if (isDarkBrown(r, g, b)) counts.darkBrown++;
+      else if (isBrown(r, g, b)) counts.brown++;
+      else if (isYellowGreen(r, g, b)) counts.yellowGreen++;
+      else if (isPale(r, g, b)) counts.pale++;
+    }
+    const total = counts.total || 1;
+    const pct = (n) => Number(((n / total) * 100).toFixed(1));
+    return { ...counts, total, whitePct: pct(counts.white),
+      pct: { brown: pct(counts.brown), darkBrown: pct(counts.darkBrown), black: pct(counts.black), red: pct(counts.red), maroon: pct(counts.maroon), pale: pct(counts.pale), yellowGreen: pct(counts.yellowGreen) },
+      avgLum: (sumR + sumG + sumB) / (3 * total) };
+  };
+
+  const isRed = (r, g, b) => r > 140 && r - g > 50 && r - b > 50 && g < 130;
+  const isMaroon = (r, g, b) => r > 90 && g < 65 && b < 65 && r - g > 45 && r > g * 1.8;
+  const isBlack = (r, g, b) => r < 60 && g < 60 && b < 60;
+  const isDarkBrown = (r, g, b) => {
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    return (r >= 55 && r < 150 && g >= 35 && g < 110 && b < 80 &&
+      r >= g && g >= b && r - b > 15 && r < g * 1.8 && lum < 100);
+  };
+  const isBrown = (r, g, b) => r >= 130 && g >= 90 && b < 125 && r >= g && g >= b && r - b > 20 && r < g * 1.7;
+  const isYellowGreen = (r, g, b) => {
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    const yellow = r >= g && g >= b && b > 100 && (r - b) > 20 && lum > 130;
+    const green = g > r && g >= b && g > 110 && lum > 130;
+    return yellow || green;
+  };
+  const isPale = (r, g, b) => {
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    return lum > 205 && max - min < 55;
+  };
+
+  const classify = (stats) => {
+    const p = stats.pct;
+    const riskSignals = p.red + p.maroon + p.black;
+    if (riskSignals >= 12 || (p.red >= 6 && p.black >= 4)) return { type: 4, confidence: scoreConfidence(riskSignals, 40) };
+    if (p.black >= 18) return { type: 4, confidence: scoreConfidence(p.black, 25) };
+    const liquidSignals = p.yellowGreen + p.pale;
+    if (liquidSignals >= 35 && p.brown + p.darkBrown < 30 && p.black + p.red < 8) return { type: 2, confidence: scoreConfidence(liquidSignals, 45) };
+    if (p.darkBrown >= 32 && p.yellowGreen + p.pale < 18) return { type: 3, confidence: scoreConfidence(p.darkBrown, 40) };
+    if (p.brown + p.darkBrown >= 40) return { type: 1, confidence: scoreConfidence(p.brown + p.darkBrown, 55) };
+    if (p.darkBrown >= 20) return { type: 3, confidence: scoreConfidence(p.darkBrown, 60) };
+    if (liquidSignals >= 20) return { type: 2, confidence: scoreConfidence(liquidSignals, 60) };
+    return { type: 1, confidence: 62 };
+  };
+
+  const scoreConfidence = (signal, base) => Math.max(55, Math.min(96, Math.round(base + signal * 0.6)));
+
+  const buildReport = (analysis, stats, file) => {
+    const def = TYPE_DEFS[analysis.type];
+    return {
+      id: 'STAR-' + Date.now().toString(36).toUpperCase(),
+      type: analysis.type, typeName: def.name, label: def.label,
+      classification: def.classification, color: def.color,
+      texture: def.texture, shape: def.shape, bristol: def.bristol,
+      risk: def.risk, riskScore: def.riskScore, confidence: analysis.confidence,
+      hydration: def.hydration, icon: def.icon, conditions: def.conditions,
+      recommendations: def.recommendations, disclaimer: DISCLAIMER,
+      colorBreakdown: stats.pct,
+      date: new Date().toISOString(),
+      dateLabel: new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      fileName: file ? file.name : 'unknown',
+    };
+  };
+
+  return { analyzeFile, TYPE_DEFS, DISCLAIMER, computeColorStats, classify };
+})();
+
+// ===== S.T.A.R. AI ASSISTANT (StarAssistant) =====
+// Offline health knowledge base that also uses the user's saved reports.
+const StarAssistant = (() => {
+  const recent = () => StarStore.getLatestReport();
+  const contextBlock = () => {
+    const latest = recent();
+    if (!latest) return 'You have not run any analyses yet.';
+    return ['Your most recent analysis:',
+      `  - Classification: ${latest.classification}`,
+      `  - Type: ${latest.typeName}`,
+      `  - Color: ${latest.color}, Texture: ${latest.texture}, Shape: ${latest.shape}`,
+      `  - Risk: ${latest.risk}, Confidence: ${latest.confidence}%`,
+      `  - Hydration estimate: ${latest.hydration}%`,
+      `  - Possible conditions: ${latest.conditions.join('; ')}`,
+    ].join('\n');
+  };
+  const normalize = (t) => t.toLowerCase().trim();
+  const answer = (rawQuestion) => {
+    const q = normalize(rawQuestion);
+    const latest = recent();
+    if (!q) return 'Please ask me a question about your health, reports, or symptoms.';
+    if (/\b(hi|hello|hey)\b/.test(q)) {
+      return 'Hello! I am your S.T.A.R. AI Health Assistant. ' + (latest
+        ? `Your latest analysis (${latest.classification}) is on file. Ask me about your report, symptoms, hydration, or what to do next.`
+        : 'Run an analysis first, then I can give you personalized advice about your results.');
+    }
+    if (/black|blood|red|maroon|tarry|type 4|type4|cancer|high risk|emergency/.test(q)) {
+      return 'You are asking about dark/red coloring or a high-risk result. ' +
+        (latest && latest.type === 4
+          ? `Your latest analysis flagged ${latest.classification} (${latest.risk} risk). Black, tarry, or bloody stool can indicate gastrointestinal bleeding. This needs prompt medical evaluation.\n\nImmediate steps:\n1. Contact a doctor or healthcare provider today.\n2. Do NOT take laxatives or stool softeners.\n3. If you feel dizzy, have severe pain, or weakness, go to emergency care.\n4. Keep a fresh sample for lab testing if your doctor asks.\n\nRemember: this is an AI screening tool and not a diagnosis.`
+          : 'Black, tarry, or bloody stool can indicate bleeding in the gastrointestinal tract and should be evaluated by a doctor promptly. If you have not had an analysis yet, run one so I can give you personalized guidance.');
+    }
+    if (/constipat|type 3|type3|hard|pellet|tight solid|difficult to pass/.test(q)) {
+      const advice = 'Constipation (Type 3) is usually helped by:\n1. Drinking more water - aim for 2.5-3 litres a day.\n2. Adding fibre: whole grains, fruits, vegetables, legumes.\n3. Daily physical activity such as walking.\n4. If it persists beyond a few days, talk to a pharmacist or doctor about a gentle stool softener.';
+      return latest && latest.type === 3 ? `Your latest analysis detected ${latest.classification}. ${advice}` : advice;
+    }
+    if (/loose|diarrhoea|diarrhea|type 2|type2|semi.?liquid|watery|motion/.test(q)) {
+      const advice = 'For loose motion (Type 2):\n1. Drink plenty of fluids and ORS to prevent dehydration.\n2. Eat bland foods - rice, bananas, toast, curd.\n3. Avoid spicy, oily and dairy-heavy food until it settles.\n4. See a doctor if it lasts more than 48 hours, or if you see blood or get a high fever.';
+      return latest && latest.type === 2 ? `Your latest analysis detected ${latest.classification}. ${advice}` : advice;
+    }
+    if (/hydrat|water|dehydrat/.test(q)) {
+      const base = 'Hydration recommendation:\n1. Healthy adults should aim for ~2.5-3 litres of fluids daily.\n2. Drink consistently through the day rather than large amounts at once.\n3. Urine colour should be pale straw yellow - darker means you need more water.\n4. After exercise or in hot weather, increase intake.';
+      return latest ? `Based on your latest analysis, your hydration estimate is ${latest.hydration}%. ` + base : base;
+    }
+    if (/report|analysis|result|latest|score/.test(q)) {
+      if (!latest) return 'You have no saved analyses yet. Go to the Analysis page, upload an image, and your report will appear here automatically.';
+      return `Here is your latest report (${latest.id}):\n• ${latest.classification} - ${latest.typeName}\n• Color: ${latest.color} | Texture: ${latest.texture} | Shape: ${latest.shape}\n• Bristol: ${latest.bristol}\n• Risk: ${latest.risk} (${latest.confidence}% confidence)\n• Possible conditions: ${latest.conditions.join(', ')}\n• Generated: ${latest.dateLabel}`;
+    }
+    if (/diet|eat|food|fibre|fiber|nutrition/.test(q)) {
+      return 'General dietary guidance for digestive health:\n1. Eat plenty of fibre: whole grains, oats, fruits, vegetables, legumes.\n2. Stay hydrated and limit excess caffeine and alcohol.\n3. Eat fermented foods (curd, buttermilk) for gut health.\n4. Avoid heavily processed, spicy and oily food when your gut is sensitive.\n' +
+        (latest ? `Given your latest result (${latest.classification}), follow the recommendations from your report for the best outcome.` : 'Run an analysis for advice tailored to your current gut health.');
+    }
+    if (/thank/.test(q)) return 'You are welcome! I am here any time you need help understanding your health data.';
+    return 'I can help with questions about:\n• Your latest analysis or report\n• Loose motion (Type 2) or constipation (Type 3)\n• Black/bloody stool or high-risk results (Type 4)\n• Hydration and diet advice\n\nTry asking "what does my latest report say?" or "constipation tips".';
+  };
+  return { answer, contextBlock };
+})();
+
+// ===== THEME =====
+let currentTheme = localStorage.getItem('starTheme') || 'light';
+applyTheme(currentTheme);
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  const toggle = document.getElementById('themeToggle');
+  const label = document.getElementById('themeLabel');
+  const isDark = theme === 'dark';
+  toggle.classList.toggle('on', isDark);
+  label.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+  localStorage.setItem('starTheme', theme);
+  updateSettingsBtns(theme);
+}
+
+function toggleTheme() {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+}
+
+function setTheme(t) {
+  applyTheme(t);
+  updateSettingsBtns(t);
+}
+
+function updateSettingsBtns(t) {
+  const lb = document.getElementById('lightModeBtn');
+  const db = document.getElementById('darkModeBtn');
+  if (!lb || !db) return;
+  if (t === 'light') {
+    lb.style.background = 'var(--accent)'; lb.style.color = 'white';
+    db.style.background = 'var(--bg3)'; db.style.color = 'var(--text)';
+  } else {
+    db.style.background = 'var(--accent)'; db.style.color = 'white';
+    lb.style.background = 'var(--bg3)'; lb.style.color = 'var(--text)';
+  }
+}
+
+// ===== NAVIGATION =====
+const pageTitles = {
+  home: 'Home', dashboard: 'Dashboard', analysis: 'Analysis',
+  diary: 'Health Diary', assistant: 'AI Assistant',
+  community: 'Community', profile: 'Profile', settings: 'Settings'
+};
+
+function navigate(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.trim().toLowerCase().includes(pageId) || 
+        (pageId === 'diary' && n.textContent.includes('Diary')) ||
+        (pageId === 'assistant' && n.textContent.includes('Assistant'))) {
+      n.classList.add('active');
+    }
+  });
+  document.getElementById('topbarTitle').textContent = pageTitles[pageId] || pageId;
+  closeSidebar();
+  window.scrollTo(0,0);
+  if (pageId === 'diary') buildWeekGrid();
+  if (pageId === 'dashboard') updateDashboard();
+  if (pageId === 'profile') updateProfile();
+}
+
+// ===== SIDEBAR MOBILE =====
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarBackdrop').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+}
+
+// ===== AUTH =====
+let currentUser = JSON.parse(localStorage.getItem('starUser') || 'null');
+if (currentUser) updateAuthUI();
+
+function showLogin() {
+  if (currentUser) { navigate('profile'); return; }
+  document.getElementById('loginOverlay').classList.add('show');
+}
+function showRegister() {
+  closeAuth();
+  document.getElementById('registerOverlay').classList.add('show');
+}
+function showLoginModal() {
+  closeAuth();
+  document.getElementById('loginOverlay').classList.add('show');
+}
+function closeAuth() {
+  document.querySelectorAll('.auth-overlay').forEach(o => o.classList.remove('show'));
+}
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (!u || !p) { alert('Please fill in all fields.'); return; }
+  const saved = JSON.parse(localStorage.getItem('starUser_' + u) || 'null');
+  if (saved && saved.pass === p) {
+    currentUser = saved;
+    localStorage.setItem('starUser', JSON.stringify(saved));
+    closeAuth(); updateAuthUI(); navigate('dashboard');
+  } else {
+    alert('Invalid credentials. Please register first.');
+  }
+}
+
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  if (!name || !email || !pass) { alert('Please fill in all required fields.'); return; }
+  const user = { name, email, pass, age: document.getElementById('regAge').value, phone: document.getElementById('regPhone').value, city: document.getElementById('regCity').value, country: document.getElementById('regCountry').value };
+  localStorage.setItem('starUser_' + email, JSON.stringify(user));
+  currentUser = user;
+  localStorage.setItem('starUser', JSON.stringify(user));
+  closeAuth(); updateAuthUI(); navigate('dashboard');
+  const msg = `🏥 *S.T.A.R. Demo Registration*\n\n👤 Name: ${name}\n📧 Email: ${email}\n📱 Phone: ${user.phone}\n🎂 Age: ${user.age}\n📍 City: ${user.city}\n🌍 Country: ${user.country}`;
+  window.open(`https://wa.me/918148507642?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function updateAuthUI() {
+  if (!currentUser) return;
+  document.getElementById('authLabel').textContent = currentUser.name;
+  document.getElementById('profileName').textContent = currentUser.name;
+  document.getElementById('profileEmail').textContent = currentUser.email;
+}
+
+// ===== ANALYSIS - AI POWERED =====
+let uploadedImageData = null;
+let uploadedFile = null;
+let lastAnalysisResult = null;
+
+function handleDragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('dragover'); }
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) processFile(file);
+}
+function handleFileSelect(input) { if (input.files[0]) processFile(input.files[0]); }
+
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploadedImageData = e.target.result;
+    uploadedFile = file;
+    document.getElementById('previewImg').src = uploadedImageData;
+    document.getElementById('imagePreviewCard').style.display = 'block';
+    document.getElementById('placeholderCard').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function runAIAnalysis() {
+  if (!uploadedImageData) return;
+  document.getElementById('analysisResult').classList.remove('show');
+  document.getElementById('placeholderCard').style.display = 'none';
+  document.getElementById('aiThinking').classList.add('show');
+  document.getElementById('analyzeBtn').disabled = true;
+  // Show staged progress messages
+  const steps = [
+    'Reading Image...',
+    'Preprocessing Pixels...',
+    'Analyzing Color...',
+    'Analyzing Texture...',
+    'Determining Stool Category...',
+    'Generating Report...',
+    'Analysis Complete.'
+  ];
+  const aiStepsEl = document.getElementById('aiSteps') || (() => {
+    const el = document.createElement('div'); el.id = 'aiSteps'; el.style.marginTop = '12px'; document.getElementById('aiThinking').appendChild(el); return el;
+  })();
+  aiStepsEl.innerHTML = '';
+  for (let i = 0; i < steps.length; i++) {
+    aiStepsEl.innerHTML = `<div style="font-weight:600">${steps[i]}</div>`;
+    await new Promise(r => setTimeout(r, 400 + (i*180)));
+  }
+
+  try {
+    const result = await StarVision.analyzeFile(uploadedFile);
+    lastAnalysisResult = result;
+    StarStore.addReport(result);
+    showAnalysisResult(result);
+    updateDashboard();
+    updateProfile();
+  } catch (err) {
+    const fallback = StarVision.TYPE_DEFS[1];
+    lastAnalysisResult = fallback;
+    showAnalysisResult(fallback);
+  }
+
+  document.getElementById('aiThinking').classList.remove('show');
+  document.getElementById('analyzeBtn').disabled = false;
+  
+  // Log to profile
+  const email = currentUser?.email;
+  if (email) {
+    const u = JSON.parse(localStorage.getItem('starUser_' + email) || '{}');
+    u.scans = (u.scans || 0) + 1;
+    u.lastAnalysis = new Date().toLocaleDateString();
+    localStorage.setItem('starUser_' + email, JSON.stringify(u));
+  }
+}
+
+function showAnalysisResult(r) {
+  const header = document.getElementById('resultHeader');
+  const classes = { LOW: 'normal', MEDIUM: 'warning', HIGH: 'danger' };
+  header.className = 'result-header ' + (classes[r.risk] || 'normal');
+  document.getElementById('resultIcon').textContent = r.icon || '🔬';
+  document.getElementById('resultTitle').textContent = r.typeName || r.classification || 'Result';
+  document.getElementById('resultSubtitle').textContent = `${r.classification || ''}${r.color ? ' • ' + r.color : ''}${r.texture ? ' • ' + r.texture : ''}${r.shape ? ' • ' + r.shape : ''}`;
+
+  const conf = Math.round(Number(r.confidence) || 0);
+  document.getElementById('confidenceText').textContent = conf + '% confidence';
+  setTimeout(() => { document.getElementById('confidenceBar').style.width = conf + '%'; }, 100);
+
+  const recItems = [];
+  (r.conditions || []).forEach(c => recItems.push(`<div class="rec-item" style="background:var(--bg2)"><div class="rec-text" style="font-weight:600">🧬 ${c}</div></div>`));
+  (r.recommendations || []).forEach(rec => recItems.push(`<div class="rec-item"><div class="rec-text">${rec}</div></div>`));
+  if (r.disclaimer) recItems.push(`<div class="rec-item" style="background:transparent"><div class="rec-text" style="font-size:12px;color:var(--muted);font-style:italic">${r.disclaimer}</div></div>`);
+  document.getElementById('recList').innerHTML = recItems.join('');
+
+  const previewImg = document.getElementById('previewImg');
+  const privacy = document.getElementById('privacyPlaceholder');
+  if (previewImg && privacy) {
+    previewImg.style.display = 'none';
+    privacy.style.display = 'flex';
+  }
+
+  document.getElementById('analysisResult').classList.add('show');
+}
+
+function resetAnalysis() {
+  uploadedImageData = null;
+  document.getElementById('imagePreviewCard').style.display = 'none';
+  document.getElementById('analysisResult').classList.remove('show');
+  document.getElementById('placeholderCard').style.display = 'block';
+  document.getElementById('fileInput').value = '';
+}
+
+function downloadReport() {
+  if (!lastAnalysisResult) return;
+  const r = lastAnalysisResult;
+  const text = `S.T.A.R. HEALTH ASSESSMENT REPORT
+Generated: ${new Date().toLocaleDateString()}
+
+CONDITION: ${r.typeName || r.classification || 'N/A'}
+CLASSIFICATION: ${r.classification || 'N/A'}
+SEVERITY: ${r.risk || 'N/A'}
+CONFIDENCE: ${Math.round(r.confidence || 0)}%
+
+SAMPLE DETAILS:
+Color: ${r.color || 'N/A'}
+Texture: ${r.texture || 'N/A'}
+Shape: ${r.shape || 'N/A'}
+Bristol Scale: ${r.bristol || 'N/A'}
+Estimated Hydration: ${r.hydration || 'N/A'}%
+Image: ${r.fileName || 'N/A'}
+
+POSSIBLE CONDITIONS:
+${(r.conditions || []).join('\n') || 'N/A'}
+
+RECOMMENDATIONS:
+${(r.recommendations || []).join('\n')}
+
+---
+${r.disclaimer || 'IMPORTANT: This is an AI-assisted preliminary assessment by S.T.A.R. Consult a qualified medical professional for proper diagnosis and treatment.'}`;
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `STAR-Report-${(r.typeName || 'Assessment').replace(/\s+/g, '-')}-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== AI ASSISTANT CHAT =====
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  appendChat('user', escapeHtml(msg));
+  appendChat('ai', '<em style="color:var(--muted)">Thinking...</em>', 'thinkingMsg');
+
+  const reply = StarAssistant.answer(msg).replace(/\n/g, '<br>');
+  const bubble = document.getElementById('thinkingMsg').querySelector('.msg-bubble');
+  bubble.innerHTML = reply;
+  document.getElementById('thinkingMsg').removeAttribute('id');
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function appendChat(role, html, id) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  if (id) div.id = id;
+  div.innerHTML = `
+    <div class="msg-avatar ${role}">${role === 'ai' ? '✦' : '👤'}</div>
+    <div class="msg-bubble">${html}</div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ===== HEALTH DIARY =====
+function buildWeekGrid() {
+  const reports = StarStore.getReports();
+  const grid = document.getElementById('weekGrid');
+  const now = new Date();
+  const dates = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    dates.push(d);
+  }
+  grid.innerHTML = dates.map((d, i) => {
+    const rep = reports.find(r => {
+      const rd = new Date(r.date);
+      return rd.getFullYear() === d.getFullYear() && rd.getMonth() === d.getMonth() && rd.getDate() === d.getDate();
+    });
+    const activeClass = (d.toDateString() === now.toDateString()) ? 'active' : '';
+    const icon = rep ? rep.icon : '•';
+    const dot = rep ? (rep.risk === 'HIGH' ? 'red' : rep.risk === 'MEDIUM' ? 'orange' : 'green') : 'empty';
+    return `
+      <div class="day-card ${activeClass}">
+        <div class="day-name">${d.toLocaleDateString('en-US', {weekday:'short'})}</div>
+        <div class="day-date">${d.toLocaleDateString('en-US', {month:'short'})} ${d.getDate()}</div>
+        <div class="day-icon">${icon}</div>
+        <div class="day-dot ${dot}"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== DASHBOARD / PROFILE (live data) =====
+function updateDashboard() {
+  const latest = StarStore.getLatestReport();
+  const hydEl = document.getElementById('hydPct');
+  const ringEl = document.getElementById('hydRing');
+  if (!latest) return;
+  const hyd = Math.round(latest.hydration || 0);
+  hydEl.textContent = hyd + '%';
+  ringEl.setAttribute('stroke-dashoffset', (364 * (1 - hyd / 100)).toFixed(1));
+
+  const bios = {
+    1: { ph: '7.2', gl: '95', pr: '12', am: '0.8', badge: 'badge-normal', label: 'Normal' },
+    2: { ph: '6.9', gl: '92', pr: '15', am: '1.4', badge: 'badge-alert', label: 'Alert' },
+    3: { ph: '7.5', gl: '98', pr: '9', am: '1.1', badge: 'badge-alert', label: 'Alert' },
+    4: { ph: '7.8', gl: '105', pr: '22', am: '2.1', badge: 'badge-danger', label: 'High' },
+  }[latest.type] || { ph: '7.2', gl: '95', pr: '12', am: '0.8', badge: 'badge-normal', label: 'Normal' };
+
+  document.getElementById('bioPh').innerHTML = `${bios.ph} <span style="font-size:14px;color:var(--muted)">pH</span>`;
+  document.getElementById('bioGlucose').innerHTML = `${bios.gl} <span style="font-size:14px;color:var(--muted)">mg/dL</span>`;
+  document.getElementById('bioProtein').innerHTML = `${bios.pr} <span style="font-size:14px;color:var(--muted)">mg/dL</span>`;
+  document.getElementById('bioAmmonia').innerHTML = `${bios.am} <span style="font-size:14px;color:var(--muted)">mmol/L</span>`;
+
+  document.getElementById('bioPhBadge').className = 'stat-badge ' + bios.badge;
+  document.getElementById('bioPhBadge').textContent = bios.label;
+  document.getElementById('bioGlucoseBadge').className = 'stat-badge ' + (latest.risk === 'HIGH' ? 'badge-danger' : 'badge-normal');
+  document.getElementById('bioGlucoseBadge').textContent = latest.risk === 'HIGH' ? 'High' : 'Normal';
+  document.getElementById('bioProteinBadge').className = 'stat-badge ' + bios.badge;
+  document.getElementById('bioProteinBadge').textContent = bios.label;
+  document.getElementById('bioAmmoniaBadge').className = 'stat-badge ' + bios.badge;
+  document.getElementById('bioAmmoniaBadge').textContent = bios.label;
+
+  const trend = document.getElementById('dashTrend');
+  const trendFill = document.getElementById('dashTrendFill');
+  const reports = StarStore.getReports();
+  if (reports.length > 1) {
+    const pts = reports.slice(0, 7).reverse().map((r, i) => {
+      const x = (i / (Math.min(7, reports.length) - 1)) * 400;
+      const y = 130 - (Math.min(100, Math.max(0, r.hydration || 50)) / 100) * 100;
+      return [x, y];
+    });
+    const d = smoothPath(pts);
+    trend.setAttribute('d', d);
+    trendFill.setAttribute('d', d + ' L400,140 L0,140 Z');
+  } else if (latest) {
+    const hydP = Math.min(100, Math.max(0, latest.hydration || 50));
+    const y = 130 - (hydP / 100) * 100;
+    const d = `M0,${y} C50,${y} 150,${y} 200,${y} S350,${y} 400,${y}`;
+    trend.setAttribute('d', d);
+    trendFill.setAttribute('d', d + ' L400,140 L0,140 Z');
+  }
+}
+
+function smoothPath(points) {
+  if (points.length < 2) return '';
+  let d = `M${points[0][0].toFixed(1)},${points[0][1].toFixed(1)}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i === 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] || p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
+function updateProfile() {
+  const reports = StarStore.getReports();
+  document.getElementById('profScans').textContent = reports.length;
+  const latest = StarStore.getLatestReport();
+  document.getElementById('profLast').textContent = latest ? latest.dateLabel : '—';
+  const avgHyd = reports.length ? Math.round(reports.reduce((s, r) => s + (r.hydration || 0), 0) / reports.length) : null;
+  document.getElementById('profHyd').textContent = avgHyd !== null ? avgHyd + '%' : '—';
+
+  const activity = document.getElementById('activityLog');
+  if (reports.length) {
+    activity.style.textAlign = 'left';
+    activity.style.padding = '4px 0';
+    activity.innerHTML = reports.slice(0, 5).map(r => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span>${r.icon} ${r.classification}</span>
+        <span style="font-size:12px;color:var(--muted)">${r.dateLabel}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// ===== COMMUNITY =====
+function showNewPost() {
+  document.getElementById('newPostOverlay').classList.add('show');
+}
+function submitPost() {
+  const title = document.getElementById('postTitle').value.trim();
+  const content = document.getElementById('postContent').value.trim();
+  if (!title || !content) { alert('Please fill in both fields.'); return; }
+  
+  const initials = currentUser ? currentUser.name[0].toUpperCase() : 'Y';
+  const name = currentUser ? currentUser.name : 'You';
+  
+  const newPost = document.createElement('div');
+  newPost.className = 'post-card';
+  newPost.innerHTML = `
+    <div class="post-author">
+      <div class="author-avatar">${initials}</div>
+      <div><div class="author-name">${name}</div><div class="author-time">Just now</div></div>
+    </div>
+    <div class="post-title">${title}</div>
+    <div class="post-body">${content}</div>
+    <div class="post-actions">
+      <button class="post-action-btn" onclick="likePost(this)">👍 0</button>
+      <button class="post-action-btn">💬 0 Comments</button>
+      <button class="post-action-btn">🔗 Share</button>
+    </div>
+  `;
+  document.getElementById('postsList').prepend(newPost);
+  closeAuth();
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postContent').value = '';
+}
+
+function likePost(btn) {
+  const num = parseInt(btn.textContent.replace(/\D/g,''));
+  btn.textContent = '👍 ' + (num + 1);
+}
+
+// ===== PARTNERSHIP =====
+function sendPartnership() {
+  const name = document.getElementById('partName').value.trim();
+  const email = document.getElementById('partEmail').value.trim();
+  const msg = document.getElementById('partMessage').value.trim();
+  if (!name || !email || !msg) { alert('Please fill all fields.'); return; }
+  const text = `🤝 *S.T.A.R. Partnership Inquiry*\n\n👤 Name: ${name}\n📧 Email: ${email}\n💬 Message: ${msg}`;
+  window.open(`https://wa.me/918148507642?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.auth-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeAuth(); });
+});
+</script>
+</body>
+</html>
